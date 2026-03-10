@@ -36,8 +36,8 @@ const navItems = [
     requiredPermissions: ['record.view'],
   },
   {
-    label: '图片检测',
-    caption: '检修照片质量自动识别',
+    label: '智能检测',
+    caption: '检修照片自动识别有无受损',
     icon: 'Picture',
     to: '/workspace/image-detector',
     routeName: 'image-detector',

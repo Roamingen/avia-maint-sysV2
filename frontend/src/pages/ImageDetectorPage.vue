@@ -1,8 +1,8 @@
 <template>
   <div class="image-detector-page">
     <el-card class="header-card">
-      <h2>图片质量检测</h2>
-      <p>上传检修照片，自动识别图片质量是否符合标准</p>
+      <h2>智能检测</h2>
+      <p>上传检修照片，自动识别飞机是否有受损</p>
     </el-card>
 
     <el-card class="upload-card">
