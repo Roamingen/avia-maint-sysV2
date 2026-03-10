@@ -49,8 +49,10 @@
 import { ref } from 'vue';
 import { Plus } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
-import apiClient from '../utils/apiClient';
+import { useAuthSession } from '../stores/authSession';
+import { buildApiUrl } from '../utils/apiBase';
 
+const auth = useAuthSession();
 const uploadRef = ref(null);
 const fileList = ref([]);
 const results = ref([]);
@@ -74,18 +76,27 @@ const detectImages = async () => {
   });
 
   try {
-    const response = await apiClient.post('/image-detection/detect/batch', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
+    const response = await fetch(buildApiUrl('/api/image-detection/detect/batch'), {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${auth.loginResult.value?.token}`
+      },
+      body: formData
     });
 
-    results.value = response.data.results.map((result, index) => ({
+    if (!response.ok) {
+      throw new Error('检测失败');
+    }
+
+    const data = await response.json();
+    results.value = data.results.map((result, index) => ({
       ...result,
       preview: fileList.value[index].url
     }));
 
     ElMessage.success('检测完成');
   } catch (error) {
-    ElMessage.error(error.response?.data?.error || '检测失败');
+    ElMessage.error(error.message || '检测失败');
   } finally {
     detecting.value = false;
   }

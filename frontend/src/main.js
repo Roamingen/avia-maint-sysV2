@@ -7,6 +7,12 @@ import router from './router';
 import { useAuthSession } from './stores/authSession';
 import './style.css';
 
-await useAuthSession().initializeAuthSession();
-
-createApp(App).use(ElementPlus).use(router).mount('#app');
+(async () => {
+  try {
+    await useAuthSession().initializeAuthSession();
+  } catch (error) {
+    console.error('Failed to initialize auth session:', error);
+  }
+  
+  createApp(App).use(ElementPlus).use(router).mount('#app');
+})();
