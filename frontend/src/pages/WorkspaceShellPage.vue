@@ -1,7 +1,7 @@
 <script setup>
 import { computed, ref } from 'vue';
 import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router';
-import { CircleCheck, DocumentAdd, Document, User, Expand, Fold } from '@element-plus/icons-vue';
+import { CircleCheck, DocumentAdd, Document, User, Expand, Fold, Picture } from '@element-plus/icons-vue';
 import { useAuthSession } from '../stores/authSession';
 
 const route = useRoute();
@@ -36,6 +36,14 @@ const navItems = [
     requiredPermissions: ['record.view'],
   },
   {
+    label: '图片检测',
+    caption: '检修照片质量自动识别',
+    icon: 'Picture',
+    to: '/workspace/image-detector',
+    routeName: 'image-detector',
+    requiredPermissions: ['record.view'],
+  },
+  {
     label: '人员管理',
     caption: '账号、角色和指定签名人配置',
     icon: 'User',
@@ -62,6 +70,7 @@ const iconComponents = {
   CircleCheck,
   DocumentAdd,
   Document,
+  Picture,
   User,
 };
 

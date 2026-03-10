@@ -7,6 +7,7 @@ import RecordsCenterPage from '../pages/RecordsCenterPage.vue';
 import UserManagementPage from '../pages/UserManagementPage.vue';
 import WorkspaceShellPage from '../pages/WorkspaceShellPage.vue';
 import ApprovalWorkbenchPage from '../pages/ApprovalWorkbenchPage.vue';
+import ImageDetectorPage from '../pages/ImageDetectorPage.vue';
 import { useAuthSession } from '../stores/authSession';
 
 function hasRoutePermission(auth, route) {
@@ -59,6 +60,15 @@ const router = createRouter({
           path: 'records',
           name: 'records-center',
           component: RecordsCenterPage,
+          meta: {
+            requiresAuth: true,
+            requiredPermissions: ['record.view'],
+          },
+        },
+        {
+          path: 'image-detector',
+          name: 'image-detector',
+          component: ImageDetectorPage,
           meta: {
             requiresAuth: true,
             requiredPermissions: ['record.view'],

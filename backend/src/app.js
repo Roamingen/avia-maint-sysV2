@@ -3,6 +3,7 @@ const cors = require('cors');
 
 const authRoutes = require('./routes/authRoutes');
 const maintenanceRoutes = require('./routes/maintenanceRoutes');
+const imageDetectionRoutes = require('./routes/imageDetectionRoutes');
 
 const app = express();
 
@@ -15,6 +16,7 @@ app.get('/health', (req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/maintenance', maintenanceRoutes);
+app.use('/api/image-detection', imageDetectionRoutes);
 
 app.use((req, res) => {
     res.status(404).json({ message: '接口不存在' });

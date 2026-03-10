@@ -14,6 +14,11 @@ backend/storage/**
 !backend/storage/tmp/.gitkeep
 !backend/storage/quarantine/.gitkeep
 
+# Python services
+backend/python-services/**/__pycache__/
+backend/python-services/**/*.pyc
+backend/python-services/**/.pytest_cache/
+
 # Hardhat files
 backend/hardhat-local/artifacts/
 backend/hardhat-local/cache/

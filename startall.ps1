@@ -175,6 +175,8 @@ if (-not (Test-Path $backendEnvPath)) {
     Write-Warning 'backend/.env was not found. Configure backend/.env before starting the backend service.'
 }
 
+$pythonDetectorPath = Join-Path $projectRoot 'backend\python-services\image-detector'
+
 $services = @(
     @{
         Name    = 'blockchain'
@@ -182,6 +184,13 @@ $services = @(
         Path    = $backendPath
         Command = 'npm run chain:node'
         Port    = 18545
+    },
+    @{
+        Name    = 'detector'
+        Title   = 'Image Detector - Python'
+        Path    = $pythonDetectorPath
+        Command = 'python detector_service.py'
+        Port    = 5001
     },
     @{
         Name    = 'backend'
@@ -226,15 +235,20 @@ Run-BackendCommand -Command 'db:seed:demo-records'
 
 Start-ServiceWindow -Service $services[1]
 if (-not $DryRun) {
-    Wait-HttpReady -Uri 'http://127.0.0.1:3000/health' -TimeoutSeconds 30 -Label 'backend API'
+    Wait-HttpReady -Uri 'http://127.0.0.1:5001/health' -TimeoutSeconds 30 -Label 'image detector service'
 }
 
 Start-ServiceWindow -Service $services[2]
+if (-not $DryRun) {
+    Wait-HttpReady -Uri 'http://127.0.0.1:3000/health' -TimeoutSeconds 30 -Label 'backend API'
+}
+
+Start-ServiceWindow -Service $services[3]
 
 if (-not $DryRun) {
     Wait-HttpReady -Uri 'http://127.0.0.1:5173/' -TimeoutSeconds 30 -Label 'frontend Vite server'
 }
 
 if (-not $DryRun) {
-    Write-Host 'Launched Hardhat local chain, redeployed the contract, then started backend API and frontend Vite.'
+    Write-Host 'All services started: Blockchain, Image Detector, Backend API, and Frontend.'
 }
