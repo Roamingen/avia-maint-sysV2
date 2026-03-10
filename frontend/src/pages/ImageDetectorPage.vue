@@ -12,7 +12,7 @@
         :on-change="handleFileChange"
         :file-list="fileList"
         list-type="picture-card"
-        accept=".jpg,.jpeg,.png"
+        accept=".jpg,.jpeg,.png,.bmp,.gif,.webp,.tiff,.tif"
         multiple
         :limit="20"
       >

@@ -27,38 +27,42 @@ class ImageDetectionController {
         return res.status(400).json({ error: 'No files uploaded' });
       }
 
-      const results = await Promise.all(
-        req.files.map(async (file) => {
+      const results = [];
+      
+      for (const file of req.files) {
+        let filename = file.originalname;
+        try {
+          // 处理文件名编码
+          filename = Buffer.from(file.originalname, 'latin1').toString('utf8');
+        } catch (e) {
+          console.error('Filename encoding error:', e);
+        }
+
+        try {
+          console.log(`Detecting image: ${filename}`);
+          const detection = await imageDetectionService.detectImage(file.path);
+          
+          results.push({
+            filename,
+            ...detection
+          });
+        } catch (error) {
+          console.error(`Detection failed for ${filename}:`, error.message);
+          results.push({
+            filename,
+            error: error.message || '检测失败'
+          });
+        } finally {
+          // 确保删除临时文件
           try {
-            const detection = await imageDetectionService.detectImage(file.path);
-            // 安全删除临时文件
-            try {
-              if (fs.existsSync(file.path)) {
-                fs.unlinkSync(file.path);
-              }
-            } catch (unlinkError) {
-              console.error('Failed to delete temp file:', unlinkError);
+            if (fs.existsSync(file.path)) {
+              fs.unlinkSync(file.path);
             }
-            return {
-              filename: Buffer.from(file.originalname, 'latin1').toString('utf8'),
-              ...detection
-            };
-          } catch (error) {
-            // 安全删除临时文件
-            try {
-              if (fs.existsSync(file.path)) {
-                fs.unlinkSync(file.path);
-              }
-            } catch (unlinkError) {
-              console.error('Failed to delete temp file:', unlinkError);
-            }
-            return {
-              filename: Buffer.from(file.originalname, 'latin1').toString('utf8'),
-              error: error.message
-            };
+          } catch (unlinkError) {
+            console.error('Failed to delete temp file:', unlinkError);
           }
-        })
-      );
+        }
+      }
 
       res.json({ results });
     } catch (error) {

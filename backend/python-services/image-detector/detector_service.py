@@ -32,15 +32,33 @@ def detect():
         return jsonify({'error': 'Empty filename'}), 400
     
     try:
-        image = Image.open(file.stream)
+        print(f'Processing file: {file.filename}')
         
-        # 转换为RGB模式
-        if image.mode != 'RGB':
+        # 读取图片
+        image = Image.open(file.stream)
+        print(f'Image opened: mode={image.mode}, size={image.size}')
+        
+        # 支持多种图片格式，统一转换为RGB模式
+        if image.mode in ('RGBA', 'LA', 'P'):
+            print(f'Converting {image.mode} to RGB')
+            # 处理透明通道，使用白色背景
+            background = Image.new('RGB', image.size, (255, 255, 255))
+            if image.mode == 'P':
+                image = image.convert('RGBA')
+            if image.mode in ('RGBA', 'LA'):
+                background.paste(image, mask=image.split()[-1])
+            else:
+                background.paste(image)
+            image = background
+        elif image.mode != 'RGB':
+            print(f'Converting {image.mode} to RGB')
             image = image.convert('RGB')
             
         img_array = np.array(image)
+        print(f'Image array shape: {img_array.shape}')
         
         # 执行预测
+        print('Running model prediction...')
         results = model(img_array, verbose=False)
         result = results[0]
         

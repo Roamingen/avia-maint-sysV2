@@ -11,14 +11,14 @@ const upload = multer({
   dest: path.join(__dirname, '../../storage/tmp'),
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
   fileFilter: (req, file, cb) => {
-    const allowedTypes = /jpeg|jpg|png/;
+    const allowedTypes = /jpeg|jpg|png|bmp|gif|webp|tiff|tif/;
     const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = allowedTypes.test(file.mimetype);
+    const mimetype = /image\/(jpeg|png|bmp|gif|webp|tiff)/.test(file.mimetype);
     
     if (mimetype && extname) {
       return cb(null, true);
     }
-    cb(new Error('Only .jpg, .jpeg, .png files are allowed'));
+    cb(new Error('Only image files are allowed (jpg, jpeg, png, bmp, gif, webp, tiff)'));
   }
 });
 

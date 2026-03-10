@@ -9,23 +9,33 @@ class ImageDetectionService {
 
   async detectImage(filePath) {
     try {
+      // 验证文件存在
+      if (!fs.existsSync(filePath)) {
+        throw new Error('File not found: ' + filePath);
+      }
+
       const formData = new FormData();
       formData.append('file', fs.createReadStream(filePath));
 
+      console.log(`Sending request to ${this.detectorUrl}/detect`);
+      
       const response = await fetch(`${this.detectorUrl}/detect`, {
         method: 'POST',
         body: formData,
         headers: formData.getHeaders()
       });
 
+      const responseText = await response.text();
+      console.log(`Response status: ${response.status}`);
+      console.log(`Response body: ${responseText}`);
+
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Detection failed: ${errorText}`);
+        throw new Error(`Detection service error: ${responseText}`);
       }
 
-      return await response.json();
+      return JSON.parse(responseText);
     } catch (error) {
-      console.error('Image detection error:', error);
+      console.error('Image detection error:', error.message);
       throw error;
     }
   }
