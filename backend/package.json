@@ -29,6 +29,7 @@
     "jsonwebtoken": "^9.0.3",
     "multer": "^2.1.1",
     "mysql2": "^3.19.0",
+    "node-fetch": "^2.7.0",
     "solc": "^0.8.34"
   },
   "devDependencies": {

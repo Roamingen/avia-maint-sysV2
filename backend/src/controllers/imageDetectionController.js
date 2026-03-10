@@ -31,15 +31,29 @@ class ImageDetectionController {
         req.files.map(async (file) => {
           try {
             const detection = await imageDetectionService.detectImage(file.path);
-            fs.unlinkSync(file.path);
+            // 安全删除临时文件
+            try {
+              if (fs.existsSync(file.path)) {
+                fs.unlinkSync(file.path);
+              }
+            } catch (unlinkError) {
+              console.error('Failed to delete temp file:', unlinkError);
+            }
             return {
-              filename: file.originalname,
+              filename: Buffer.from(file.originalname, 'latin1').toString('utf8'),
               ...detection
             };
           } catch (error) {
-            fs.unlinkSync(file.path);
+            // 安全删除临时文件
+            try {
+              if (fs.existsSync(file.path)) {
+                fs.unlinkSync(file.path);
+              }
+            } catch (unlinkError) {
+              console.error('Failed to delete temp file:', unlinkError);
+            }
             return {
-              filename: file.originalname,
+              filename: Buffer.from(file.originalname, 'latin1').toString('utf8'),
               error: error.message
             };
           }

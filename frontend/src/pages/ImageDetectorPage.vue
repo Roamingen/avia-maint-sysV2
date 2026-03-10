@@ -34,10 +34,14 @@
           <el-image :src="result.preview" fit="cover" class="result-image" />
           <div class="result-info">
             <div class="filename">{{ result.filename }}</div>
-            <el-tag :type="result.is_normal ? 'success' : 'danger'" size="large">
-              {{ result.predicted_class === 'normal' ? '正常' : '异常' }}
+            <el-tag v-if="!result.error" :type="result.is_normal ? 'success' : 'danger'" size="large">
+              {{ result.is_normal ? '正常' : '异常' }}
             </el-tag>
-            <div class="confidence">置信度: {{ (result.confidence * 100).toFixed(2) }}%</div>
+            <el-tag v-else type="info" size="large">检测失败</el-tag>
+            <div v-if="!result.error" class="confidence">
+              置信度: {{ (result.confidence * 100).toFixed(2) }}%
+            </div>
+            <div v-else class="error-msg">{{ result.error }}</div>
           </div>
         </div>
       </div>
@@ -181,5 +185,11 @@ const clearAll = () => {
   margin-top: 10px;
   font-size: 13px;
   color: #999;
+}
+
+.error-msg {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #f56c6c;
 }
 </style>

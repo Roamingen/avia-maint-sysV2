@@ -1,5 +1,6 @@
 const FormData = require('form-data');
 const fs = require('fs');
+const fetch = require('node-fetch');
 
 class ImageDetectionService {
   constructor() {
@@ -18,7 +19,8 @@ class ImageDetectionService {
       });
 
       if (!response.ok) {
-        throw new Error(`Detection failed: ${response.statusText}`);
+        const errorText = await response.text();
+        throw new Error(`Detection failed: ${errorText}`);
       }
 
       return await response.json();
