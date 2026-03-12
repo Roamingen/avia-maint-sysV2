@@ -38,7 +38,7 @@ function formatDateTime(value) {
 function statusLabel(status) {
   const mapping = {
     submitted: '待审核',
-    peer_checked: '待复核',
+    peer_checked: '待放行',
     rii_approved: '待放行',
     released: '已放行',
     rejected: '已驳回',
@@ -53,11 +53,27 @@ async function fetchWorkbench() {
 
   try {
     loading.value = true;
-    workbench.value = await authorizedJsonRequest(
+    const result = await authorizedJsonRequest(
       auth.loginResult.value.token,
       '/api/maintenance/workbench',
       { method: 'GET' },
     );
+    
+    console.log('=== 工作台数据返回 ===');
+    console.log('审核队列:', result.queues.review.length, '条');
+    if (result.queues.review.length > 0) {
+      result.queues.review.forEach((item, idx) => {
+        console.log(`  ${idx + 1}. ${item.aircraftRegNo} - ${item.status}`);
+      });
+    }
+    console.log('放行队列:', result.queues.release.length, '条');
+    if (result.queues.release.length > 0) {
+      result.queues.release.forEach((item, idx) => {
+        console.log(`  ${idx + 1}. ${item.aircraftRegNo} - ${item.status}`);
+      });
+    }
+    
+    workbench.value = result;
   } catch (error) {
     ElMessage.error(error.message || '加载审批工作台失败');
   } finally {
@@ -192,7 +208,12 @@ async function executeAction(record, signerRole, action, withReason = false) {
 
     console.log('✅ 签名提交成功');
     ElMessage.success(`${action === 'reject' ? '驳回' : action === 'release' ? '放行' : '审核'}成功`);
+    
+    console.log('=== 开始刷新工作台数据 ===');
     await fetchWorkbench();
+    console.log('=== 工作台数据刷新完成 ===');
+    console.log('审核队列记录数:', workbench.value.queues.review.length);
+    console.log('放行队列记录数:', workbench.value.queues.release.length);
   } catch (error) {
     if (error !== 'cancel') {
       console.error('=== 操作失败 ===');
@@ -228,7 +249,7 @@ async function executeAction(record, signerRole, action, withReason = false) {
 
 async function handleReview(record) {
   // 预检查
-  if (record.status !== 'submitted' && record.status !== 'peer_checked') {
+  if (record.status !== 'submitted') {
     ElMessage.warning(`记录状态为 ${record.status}，不能进行审核签名`);
     return;
   }
@@ -268,12 +289,12 @@ async function handleRelease(record) {
       <article class="module-panel member-card">
         <div class="module-title">待审核</div>
         <div class="member-card-count">{{ workbench.summary.pendingReviewCount }}</div>
-        <div class="module-subtitle">当前处于 submitted / peer_checked</div>
+        <div class="module-subtitle">当前处于 submitted</div>
       </article>
       <article class="module-panel member-card">
         <div class="module-title">待放行</div>
         <div class="member-card-count">{{ workbench.summary.pendingReleaseCount }}</div>
-        <div class="module-subtitle">当前处于 rii_approved</div>
+        <div class="module-subtitle">当前处于 peer_checked / rii_approved</div>
       </article>
     </section>
 

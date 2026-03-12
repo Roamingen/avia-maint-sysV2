@@ -976,8 +976,8 @@ async function getWorkbench(currentAddress) {
 
     const [allRecords, reviewQueue, releaseQueue, rejectedQueue, recentActivity] = await Promise.all([
         maintenanceStore.listRecordSummaries({ page: 1, pageSize: 1 }),
-        maintenanceStore.listRecordSummaries({ page: 1, pageSize: 6, statuses: ['submitted', 'peer_checked'] }),
-        maintenanceStore.listRecordSummaries({ page: 1, pageSize: 6, statuses: ['rii_approved'] }),
+        maintenanceStore.listRecordSummaries({ page: 1, pageSize: 6, statuses: ['submitted'] }),
+        maintenanceStore.listRecordSummaries({ page: 1, pageSize: 6, statuses: ['peer_checked', 'rii_approved'] }),
         maintenanceStore.listRecordSummaries({ page: 1, pageSize: 6, statuses: ['rejected'] }),
         maintenanceStore.listRecordSummaries({ page: 1, pageSize: 8 }),
     ]);

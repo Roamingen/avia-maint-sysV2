@@ -27,7 +27,7 @@ const filters = reactive({
 const statusOptions = [
   { label: '全部记录', value: '' },
   { label: '待审核', value: 'submitted' },
-  { label: '待放行', value: 'rii_approved' },
+  { label: '待放行', value: 'peer_checked,rii_approved' },
   { label: '已驳回', value: 'rejected' },
   { label: '已放行', value: 'released' },
 ];
@@ -44,7 +44,7 @@ function formatDateTime(value) {
 function statusLabel(status) {
   const mapping = {
     submitted: '待审核',
-    peer_checked: '待复核',
+    peer_checked: '待放行',
     rii_approved: '待放行',
     released: '已放行',
     rejected: '已驳回',
@@ -72,7 +72,8 @@ async function fetchRecords() {
       params.set('aircraftRegNo', filters.aircraftRegNo);
     }
     if (filters.status) {
-      params.set('status', filters.status);
+      // 支持逗号分隔的多状态筛选
+      params.set('statuses', filters.status);
     }
 
     const data = await authorizedJsonRequest(
